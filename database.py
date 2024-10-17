@@ -1,4 +1,15 @@
 import sqlite3
+import mysql.connector
+
+mydb = mysql.connector.connect(
+  host="localhost",
+  user="root",
+  password="",
+  database="basededatos"
+
+)
+
+mycursor = mydb.cursor()
 
 class Database:
     def __init__(self):
@@ -7,43 +18,53 @@ class Database:
         self.create_tables()
 
     def create_tables(self):
-        # Crear tabla de productos
         self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS products (
-                id INTEGER PRIMARY KEY,
+                id TEXT PRIMARY KEY,
                 name TEXT NOT NULL,
-                price REAL NOT NULL,
-                stock INTEGER NOT NULL
+                price REAL NOT NULL
             )
         ''')
-       
-        # Crear tabla de clientes
-        self.cursor.execute('''
-            CREATE TABLE IF NOT EXISTS customers (
-                id INTEGER PRIMARY KEY,
-                name TEXT NOT NULL,
-                email TEXT
-            )
-        ''')
-       
-        # Crear tabla de ventas
-        self.cursor.execute('''
-            CREATE TABLE IF NOT EXISTS sales (
-                id INTEGER PRIMARY KEY,
-                customer_id INTEGER,
-                date TEXT NOT NULL,
-                total REAL NOT NULL,
-                FOREIGN KEY (customer_id) REFERENCES customers (id)
-            )
-        ''')
-       
         self.conn.commit()
 
-    def close(self):
-        self.conn.close()
+    def add_product(self):
+        id = input("Escanea o ingresa el código: ")
+        name = input("Nombre del producto: ")
+        price = input("Precio: ")
 
-    # Aquí puedes agregar más métodos para interactuar con la base de datos
-    # como add_product(), get_product(), update_product(), delete_product(), etc.
+        mycursor.execute(f"INSERT INTO productos (id, nombre, precio) VALUES ({id},'{name}',{price})")
+        mydb.commit()
 
+        print("Producto agregado!")
 
- 
+    def get_product(self, id):
+        mycursor.execute('SELECT name, price FROM products WHERE id = {id}')
+        result = mycursor.fetchone()
+        if result:
+            return result
+        return None
+
+def main():
+    db = Database()
+    print("1. Agregar producto")
+    print("2. Modo escaneo")
+    option = input("Seleccione opción: ")
+   
+    if option == "1":
+        db.add_product()
+       
+    elif option == "2":
+
+        interruption = 1
+
+        while(interruption):
+
+            code = int(input("Escanee o ingrese codigo manualmente: "))
+
+            if(code == 0 ):
+                interruption = 0
+            else:
+                db.get_product(code)
+
+if __name__ == "__main__":
+    main()
