@@ -1,5 +1,5 @@
 import sqlite3
-import mysql.connector
+import mysql.connector 
 
 mydb = mysql.connector.connect(
   host="localhost",
@@ -38,8 +38,10 @@ class Database:
         print("Producto agregado!")
 
     def get_product(self, id):
-        mycursor.execute('SELECT name, price FROM products WHERE id = {id}')
+
+        mycursor.execute(f"SELECT nombre, precio FROM productos WHERE id = {id}")
         result = mycursor.fetchone()
+
         if result:
             return result
         return None
@@ -64,7 +66,12 @@ def main():
             if(code == 0 ):
                 interruption = 0
             else:
-                db.get_product(code)
+                result = db.get_product(code)
+
+                if(result):
+                    print(result[0] + ": $" + str(result[1]))
+                else:
+                    print(f"No se encontro el producto")
 
 if __name__ == "__main__":
     main()
